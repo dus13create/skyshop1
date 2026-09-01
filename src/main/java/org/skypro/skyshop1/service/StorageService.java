@@ -46,4 +46,7 @@ public class StorageService {
         articleMap.put(article1.getId(), article1);
         articleMap.put(article2.getId(), article2);
     }
+    public Optional<Product> getProductById(UUID id) {
+        return Optional.ofNullable(productMap.get(id));
+    }
 }
