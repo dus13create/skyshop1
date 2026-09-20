@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.skypro.skyshop1.exception.NoSuchProductException;
 
 @Service
 public class BasketService {
@@ -23,8 +24,9 @@ public class BasketService {
 
     public void addProduct(UUID id) {
         Optional productOpt = storageService.getProductById(id);
+        // Если товар не найден, выбрасываем свое исключение
         if (!productOpt.isPresent()) {
-            throw new IllegalArgumentException("Product not found");
+            throw new NoSuchProductException("Product not found: " + id);
         }
         productBasket.addProduct(id);
     }
