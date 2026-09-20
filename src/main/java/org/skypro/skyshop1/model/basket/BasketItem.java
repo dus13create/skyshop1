@@ -17,4 +17,8 @@ public class BasketItem {
     public int getQuantity() {
         return quantity;
     }
+
+    public int getCount() {
+      return 0;
+    }
 }
