@@ -2,14 +2,12 @@ package org.skypro.skyshop1.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.skypro.skyshop1.model.product.Product;
-import org.skypro.skyshop1.model.search.Searchable;
-import org.skypro.skyshop1.service.SearchService;
-import org.skypro.skyshop1.service.StorageService;
-
+import org.skypro.skyshop1.model.search.SearchResult;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -20,41 +18,37 @@ class SearchServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Создаем мок для StorageService
         storageService = mock(StorageService.class);
-        // Передаем мок в сервис поиска
         searchService = new SearchService(storageService);
     }
 
     @Test
     void searchWhenStorageEmpty() {
-        // Хранилище пустое
         when(storageService.getAllSearchables()).thenReturn(Collections.emptyList());
-        List result = searchService.search("яблоко");
-        // Ожидаем, что найдено ничего не будет
+        Collection result = searchService.search("яблоко");
         assertTrue(result.isEmpty());
     }
 
     @Test
     void searchNoMatches() {
-        // В хранилище есть объект, но он не подходит
         Product product = mock(Product.class);
-        when(product.toString()).thenReturn("Банан");
+        when(product.getName()).thenReturn("Банан");
         when(storageService.getAllSearchables()).thenReturn(List.of(product));
-        List result = searchService.search("яблоко");
-        // Совпадений нет
+        Collection result = searchService.search("яблоко");
         assertTrue(result.isEmpty());
     }
 
     @Test
     void searchWithMatch() {
-        // В хранилище есть подходящий объект
         Product product = mock(Product.class);
-        when(product.toString()).thenReturn("Яблоко");
+        UUID id = UUID.randomUUID();
+        when(product.getName()).thenReturn("Яблоко");
+        when(product.getId()).thenReturn(id);
         when(storageService.getAllSearchables()).thenReturn(List.of(product));
-        List result = searchService.search("Яблоко");
-        // Найден ровно один объект
+        Collection<SearchResult> result = searchService.search("Яблоко"); // <--- исправлено!
         assertEquals(1, result.size());
-        assertEquals(product, result.get(0));
+        SearchResult searchResult = result.iterator().next();
+        assertEquals("Яблоко", searchResult.getName());
+        assertEquals(id.toString(), searchResult.getId());
     }
 }
